@@ -14,7 +14,6 @@ public class RedisSubscriber extends MessageListenerAdapter {
 
     @Override
     public void onMessage(Message message, byte[] bytes) {
-        System.out.println(message);
         byte[] body = message.getBody();
         byte[] channel = message.getChannel();
         String msg = redisTemplate.getStringSerializer().deserialize(body);

@@ -2,6 +2,8 @@ package cn.monitor4all.springbootwebsocketdemo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +32,13 @@ public class SampleController {
     String send2(String data) {
         redisTemplate.convertAndSend("msg.toCid", data);
         return "success";
+    }
+
+    @MessageMapping("/welcome")
+    @SendTo("/topic/getResponse")
+    public ResponseMessage say(RequestMessage message) {
+        System.out.println(message.getName());
+        return new ResponseMessage("welcome," + message.getName() + " !");
     }
 
 }
