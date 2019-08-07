@@ -34,11 +34,5 @@ public class SampleController {
         return "success";
     }
 
-    @MessageMapping("/welcome")
-    @SendTo("/topic/getResponse")
-    public ResponseMessage say(RequestMessage message) {
-        System.out.println(message.getName());
-        return new ResponseMessage("welcome," + message.getName() + " !");
-    }
 
 }
