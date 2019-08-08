@@ -15,14 +15,4 @@ public class SpringbootWebsocketDemoApplication {
         SpringApplication.run(SpringbootWebsocketDemoApplication.class, args);
     }
 
-    @Bean
-    RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
-                                            MessageListenerAdapter listenerAdapter) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new PatternTopic("msg.toAll"));
-        container.addMessageListener(listenerAdapter, new PatternTopic("msg.toCid"));
-        return container;
-    }
-
 }
