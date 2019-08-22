@@ -18,16 +18,21 @@ public class ChatController {
     @SendTo("/topic/public")
     public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
         return chatMessage;
+
+        // TODO: 监听到Redis消息，向聊天频道发送消息
     }
 
     @MessageMapping("/chat.addUser")
     @SendTo("/topic/public")
     public ChatMessage addUser(@Payload ChatMessage chatMessage,
                                SimpMessageHeaderAccessor headerAccessor) {
+
         // Add username in web socket session
         logger.info("User added in Chatroom:" + chatMessage.getSender());
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatMessage;
+
+        // TODO: 在Redis注册用户session
     }
 
 }
