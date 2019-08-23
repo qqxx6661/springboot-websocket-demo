@@ -1,8 +1,12 @@
 package cn.monitor4all.springbootwebsocketdemo.controller;
 
 import cn.monitor4all.springbootwebsocketdemo.model.ChatMessage;
+import cn.monitor4all.springbootwebsocketdemo.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -12,14 +16,21 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChatController.class);
+
+    @Value("${redis.channel.msgToAll}")
+    private String msgToAll;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/public")
-    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
-        return chatMessage;
-
-        // TODO: 监听到Redis消息，向聊天频道发送消息
+    public void sendMessage(@Payload ChatMessage chatMessage) {
+        try {
+            redisTemplate.convertAndSend(msgToAll, JsonUtil.parseObjToJson(chatMessage));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @MessageMapping("/chat.addUser")
@@ -28,11 +39,9 @@ public class ChatController {
                                SimpMessageHeaderAccessor headerAccessor) {
 
         // Add username in web socket session
-        logger.info("User added in Chatroom:" + chatMessage.getSender());
+        LOGGER.info("User added in Chatroom:" + chatMessage.getSender());
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatMessage;
-
-        // TODO: 在Redis注册用户session
     }
 
 }
